@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Numerics;
 using System.Reflection.PortableExecutable;
+using System.Runtime.Intrinsics;
 
 string scene = "startScreen";
 string start = "Press SPACE to start le PEAKMEN";
@@ -12,8 +13,15 @@ Raylib.InitWindow(1000, 1000, "PEAKMAN");
 
 int maxLength = 300;
 
-int pikminPosX = 500; 
+int pikminPosX = 500;
 int pikminPosY = 500;
+
+int pelletPosX = 200;
+int pelletPosY = 200;
+
+bool pikminHeld = false;
+bool pikminThrown = false;
+
 
 int mousePositionX = Raylib.GetMouseX();
 int mousePositionY = Raylib.GetMouseY();
@@ -31,7 +39,11 @@ Vector2 mousePosition = new Vector2(mousePositionX, mousePositionY);
 
 Vector2 diff = new Vector2();
 
-Vector2 pikminTruePos = new Vector2(pikminPosX,pikminPosY);
+Vector2 pikminTruePos = new Vector2();
+
+Vector2 pelletTruePos = new Vector2();
+
+Vector2 pikminRelative = new Vector2();
 
 int throwVector = (int)diff.Length();
 
@@ -42,7 +54,7 @@ while (!Raylib.WindowShouldClose())
     {
         Raylib.ClearBackground(Color.WHITE);
         Raylib.BeginDrawing();
-        Raylib.DrawText(start, screenSizeX / 3, screenSizeY / 3, 20, Color.DARKBLUE);
+        Raylib.DrawText(start, screenSizeX / 6, screenSizeY / 3, 20, Color.DARKBLUE);
         Raylib.EndDrawing();
         if (Raylib.IsKeyDown(KeyboardKey.KEY_SPACE))
         {
@@ -52,28 +64,40 @@ while (!Raylib.WindowShouldClose())
     }
     if (scene == "game")
     {
-        centeredLouie = new Vector2(centerLouieHeight + positionLouie.X, centerLouieHeight + positionLouie.Y );
+        centeredLouie = new Vector2(centerLouieHeight + positionLouie.X, centerLouieHeight + positionLouie.Y);
         Raylib.ClearBackground(Color.WHITE);
         LouieMovement();
         Raylib.BeginDrawing();
         Raylib.DrawTextureRec(Louie, rectLouie, positionLouie, Color.WHITE);
         //Raylib.DrawCircle((int)positionLouie.X,(int) positionLouie.Y, 300, Color.BEIGE);
-
-        Raylib.DrawCircle(pikminPosX, pikminPosY,20,Color.BLACK);
-        if(pikminTruePos = positionLouie)
+        if(!pikminHeld)
         {
-            System.Console.WriteLine("YAYYYAYA");
+            pikminRelative = pikminTruePos - centeredLouie;
+            if ((int)Math.Ceiling(pikminRelative.Length()) > 100)
+            {
+                pikminTruePos = new Vector2(pikminPosX, pikminPosY);
+                pikminRelative = Vector2.Normalize(pikminRelative) * -2;
+                pikminPosX += (int)Math.Ceiling(pikminRelative.X);
+                pikminPosY += (int)Math.Ceiling(pikminRelative.Y);
+            }
         }
-        
+        Raylib.DrawCircle(pikminPosX, pikminPosY, 20, Color.BLACK);
+
+        Raylib.DrawCircle(pelletPosX, pelletPosY, 20, Color.RED);
+
+        if (Raylib.CheckCollisionCircles(pikminTruePos, 20, pelletTruePos, 10))
+        {
+
+        }
 
         //Throwing indicator
-        if (Raylib.IsMouseButtonDown(MouseButton.MOUSE_LEFT_BUTTON)) 
+        if (Raylib.IsMouseButtonDown(MouseButton.MOUSE_LEFT_BUTTON))
         {
             mousePositionX = Raylib.GetMouseX();
             mousePositionY = Raylib.GetMouseY();
 
             mousePosition = new Vector2(mousePositionX, mousePositionY);
-            Vector2 tempPos = new Vector2(positionLouie.X + Louie.Height/2, positionLouie.Y + Louie.Width/2);
+            Vector2 tempPos = new Vector2(positionLouie.X + Louie.Height / 2, positionLouie.Y + Louie.Width / 2);
             diff = mousePosition - tempPos;
             throwVector = (int)diff.Length();
 
@@ -82,7 +106,6 @@ while (!Raylib.WindowShouldClose())
 
             if (throwVector < maxLength)
             {
-                Console.WriteLine("here");
                 Raylib.DrawLine((int)positionLouie.X + Louie.Height / 2, (int)positionLouie.Y + Louie.Width / 2, (int)mousePosition.X, (int)mousePosition.Y, Color.BLACK);
             }
 
@@ -94,7 +117,32 @@ while (!Raylib.WindowShouldClose())
             // var pikmin1 = new Pikmin() {startPosX = mousePositionX, startPosY = mousePositionY};
 
         }
-         Raylib.EndDrawing();
+
+        //Throwing Pikmin
+        if(Raylib.IsMouseButtonPressed(MouseButton.MOUSE_LEFT_BUTTON))
+        {
+            pikminHeld = true;
+            pikminPosX = (int)centeredLouie.X;
+            pikminPosY = (int)centeredLouie.Y;
+        }  
+
+
+        if(Raylib.IsMouseButtonReleased(MouseButton.MOUSE_LEFT_BUTTON))
+        {
+            pikminThrown = true;
+        }
+        if(pikminThrown)
+        {
+            
+        }
+
+        if (Raylib.IsMouseButtonDown(MouseButton.MOUSE_RIGHT_BUTTON))
+        {
+            pikminHeld = false;
+            pikminThrown = false;
+        }
+
+        Raylib.EndDrawing();
     }
 }
 
@@ -124,11 +172,33 @@ void LouieMovement()
     }
 }
 
-//     public class Pikmin
+// public class Pikmin
 // {
-//     public int startPosX { set; get; }
-//     public int startPosY { set; get; }
-//     public int degreeTrow{ set; get; }
+
+//     public int posX;
+//     public int posY;
+//     public int degreeTrow;
+
+//     public Pikmin(int posX, int posY)
+//     {
+//         this.posX = posX;
+//         this.posY = posY;
+//     }
+
+
+//     public void Move()
+//     {
+//         pikminRelative = pikminTruePos - centeredLouie;
+//         if ((int)Math.Ceiling(pikminRelative.Length()) > 100)
+//         {
+//             pikminTruePos = new Vector2(pikminPosX, pikminPosY);
+//             pikminRelative = Vector2.Normalize(pikminRelative) * -2;
+//             pikminPosX += (int)Math.Ceiling(pikminRelative.X);
+//             pikminPosY += (int)Math.Ceiling(pikminRelative.Y);
+//         }
+
+
+//     }
 // }
 
 
