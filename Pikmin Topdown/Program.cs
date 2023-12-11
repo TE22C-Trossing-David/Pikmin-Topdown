@@ -12,6 +12,9 @@ Raylib.InitWindow(1000, 1000, "PEAKMAN");
 
 int maxLength = 300;
 
+int pikminPosX = 500; 
+int pikminPosY = 500;
+
 int mousePositionX = Raylib.GetMouseX();
 int mousePositionY = Raylib.GetMouseY();
 
@@ -27,6 +30,8 @@ Vector2 centeredLouie = new Vector2();
 Vector2 mousePosition = new Vector2(mousePositionX, mousePositionY);
 
 Vector2 diff = new Vector2();
+
+Vector2 pikminTruePos = new Vector2(pikminPosX,pikminPosY);
 
 int throwVector = (int)diff.Length();
 
@@ -53,6 +58,13 @@ while (!Raylib.WindowShouldClose())
         Raylib.BeginDrawing();
         Raylib.DrawTextureRec(Louie, rectLouie, positionLouie, Color.WHITE);
         //Raylib.DrawCircle((int)positionLouie.X,(int) positionLouie.Y, 300, Color.BEIGE);
+
+        Raylib.DrawCircle(pikminPosX, pikminPosY,20,Color.BLACK);
+        if(pikminTruePos = positionLouie)
+        {
+            System.Console.WriteLine("YAYYYAYA");
+        }
+        
 
         //Throwing indicator
         if (Raylib.IsMouseButtonDown(MouseButton.MOUSE_LEFT_BUTTON)) 
