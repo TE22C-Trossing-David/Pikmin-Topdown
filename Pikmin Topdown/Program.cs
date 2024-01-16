@@ -11,41 +11,47 @@ int screenSizeX = 1920;
 int screenSizeY = 1080;
 Raylib.InitWindow(1000, 1000, "PEAKMAN");
 
-int maxLength = 300;
-
 int pikminPosX = 500;
 int pikminPosY = 500;
-
-int pelletPosX = 200;
-int pelletPosY = 200;
+Vector2 pikminTruePos = new Vector2();
+Vector2 pikminRelative = new Vector2();
 
 bool pikminHeld = false;
 bool pikminThrown = false;
+int maxLength = 300;
+Vector2 pikminThrowDist = new Vector2();
+Vector2 pikminThrowDiff = new Vector2();
+
+int whistlePosX;
+int whistlePosY;
+Vector2 whistlePos = new Vector2();
+Vector2 pikminWhistleDiff = new Vector2();
+int pikminWhistleLength = (int)pikminWhistleDiff.Length();
+
+Vector2 throwPosition = new Vector2();
+Vector2 indicatorPoint = new Vector2();
+
+int whistleRange = 150;
+int whistleRangeTrue = 170;
 
 
 int mousePositionX = Raylib.GetMouseX();
 int mousePositionY = Raylib.GetMouseY();
+Vector2 mousePosition = new Vector2(mousePositionX, mousePositionY);
+
+bool pikminDestReached = false;
 
 Texture2D Louie = Raylib.LoadTexture("Louie.png");
 Rectangle rectLouie = new Rectangle(0, 0, Louie.Width, Louie.Height);
 
 int centerLouieWidth = Louie.Width / 2;
 int centerLouieHeight = Louie.Height / 2;
-
 Vector2 positionLouie = new Vector2(centerLouieWidth, centerLouieHeight);
 Vector2 centeredLouie = new Vector2();
 
-Vector2 mousePosition = new Vector2(mousePositionX, mousePositionY);
-
 Vector2 diff = new Vector2();
-
-Vector2 pikminTruePos = new Vector2();
-
-Vector2 pelletTruePos = new Vector2();
-
-Vector2 pikminRelative = new Vector2();
-
 int throwVector = (int)diff.Length();
+int pikminDiffLength = (int)pikminThrowDiff.Length();
 
 while (!Raylib.WindowShouldClose())
 {
@@ -56,39 +62,44 @@ while (!Raylib.WindowShouldClose())
         Raylib.BeginDrawing();
         Raylib.DrawText(start, screenSizeX / 6, screenSizeY / 3, 20, Color.DARKBLUE);
         Raylib.EndDrawing();
+
+        //Startar spelet
         if (Raylib.IsKeyDown(KeyboardKey.KEY_SPACE))
         {
             scene = "game";
 
         }
     }
+
     if (scene == "game")
     {
         centeredLouie = new Vector2(centerLouieHeight + positionLouie.X, centerLouieHeight + positionLouie.Y);
-        Raylib.ClearBackground(Color.WHITE);
         LouieMovement();
+
+        Raylib.ClearBackground(Color.WHITE);
         Raylib.BeginDrawing();
         Raylib.DrawTextureRec(Louie, rectLouie, positionLouie, Color.WHITE);
-        //Raylib.DrawCircle((int)positionLouie.X,(int) positionLouie.Y, 300, Color.BEIGE);
-        if(!pikminHeld)
+        Raylib.DrawCircle(pikminPosX, pikminPosY, 20, Color.BLACK);
+
+
+
+
+        //Normala Pikmin walk
+        if (!pikminHeld)
         {
-            pikminRelative = pikminTruePos - centeredLouie;
+            pikminRelative = centeredLouie - pikminTruePos;
+
+
             if ((int)Math.Ceiling(pikminRelative.Length()) > 100)
             {
                 pikminTruePos = new Vector2(pikminPosX, pikminPosY);
-                pikminRelative = Vector2.Normalize(pikminRelative) * -2;
+                pikminRelative = Vector2.Normalize(pikminRelative) * 2;
                 pikminPosX += (int)Math.Ceiling(pikminRelative.X);
                 pikminPosY += (int)Math.Ceiling(pikminRelative.Y);
             }
         }
-        Raylib.DrawCircle(pikminPosX, pikminPosY, 20, Color.BLACK);
 
-        Raylib.DrawCircle(pelletPosX, pelletPosY, 20, Color.RED);
 
-        if (Raylib.CheckCollisionCircles(pikminTruePos, 20, pelletTruePos, 10))
-        {
-
-        }
 
         //Throwing indicator
         if (Raylib.IsMouseButtonDown(MouseButton.MOUSE_LEFT_BUTTON))
@@ -96,50 +107,99 @@ while (!Raylib.WindowShouldClose())
             mousePositionX = Raylib.GetMouseX();
             mousePositionY = Raylib.GetMouseY();
 
+            //Räknar ut hur linjen ska se ut 
             mousePosition = new Vector2(mousePositionX, mousePositionY);
-            Vector2 tempPos = new Vector2(positionLouie.X + Louie.Height / 2, positionLouie.Y + Louie.Width / 2);
-            diff = mousePosition - tempPos;
+            diff = mousePosition - centeredLouie;
             throwVector = (int)diff.Length();
 
 
-            Vector2 tempVector = Vector2.Normalize(diff) * maxLength;
+            indicatorPoint = Vector2.Normalize(diff) * maxLength;
 
             if (throwVector < maxLength)
             {
-                Raylib.DrawLine((int)positionLouie.X + Louie.Height / 2, (int)positionLouie.Y + Louie.Width / 2, (int)mousePosition.X, (int)mousePosition.Y, Color.BLACK);
+                Raylib.DrawLine((int)centeredLouie.X, (int)centeredLouie.Y, (int)mousePosition.X, (int)mousePosition.Y, Color.BLACK);
             }
 
             if (throwVector > maxLength)
             {
-                Raylib.DrawLine((int)positionLouie.X + Louie.Height / 2, (int)positionLouie.Y + Louie.Width / 2, (int)positionLouie.X + Louie.Height / 2 + (int)tempVector.X, (int)positionLouie.Y + Louie.Height / 2 + (int)tempVector.Y, Color.BLACK);
+                Raylib.DrawLine((int)centeredLouie.X, (int)centeredLouie.Y, (int)centeredLouie.X + (int)indicatorPoint.X, (int)centeredLouie.Y + (int)indicatorPoint.Y, Color.BLACK);
             }
 
             // var pikmin1 = new Pikmin() {startPosX = mousePositionX, startPosY = mousePositionY};
 
         }
 
+
+
         //Throwing Pikmin
-        if(Raylib.IsMouseButtonPressed(MouseButton.MOUSE_LEFT_BUTTON))
+        if (Raylib.IsMouseButtonDown(MouseButton.MOUSE_LEFT_BUTTON) && !pikminThrown)
         {
             pikminHeld = true;
             pikminPosX = (int)centeredLouie.X;
             pikminPosY = (int)centeredLouie.Y;
-        }  
+        }
 
 
-        if(Raylib.IsMouseButtonReleased(MouseButton.MOUSE_LEFT_BUTTON))
+
+
+        if (Raylib.IsMouseButtonReleased(MouseButton.MOUSE_LEFT_BUTTON))
         {
             pikminThrown = true;
-        }
-        if(pikminThrown)
-        {
-            
+            throwPosition = new Vector2(mousePositionX, mousePositionY);
+            if (throwVector > maxLength)
+            {
+
+                throwPosition.X = (int)centeredLouie.X + (int)indicatorPoint.X;
+                throwPosition.Y = (int)centeredLouie.Y + (int)indicatorPoint.Y;
+            }
         }
 
+
+
+
+
+        //Throwing Calculations
+        if (pikminThrown && !pikminDestReached)
+        {
+            pikminTruePos = new Vector2(pikminPosX, pikminPosY);
+
+            pikminThrowDist = throwPosition - pikminTruePos;
+            pikminThrowDiff = Vector2.Normalize(pikminThrowDist) * 3;
+
+            pikminPosX += (int)Math.Round(pikminThrowDiff.X);
+            pikminPosY += (int)Math.Round(pikminThrowDiff.Y);
+
+            if ((int)Math.Ceiling(pikminThrowDist.Length()) < 2)
+            {
+                pikminPosX = (int)throwPosition.X;
+                pikminPosY = (int)throwPosition.Y;
+                pikminDestReached = true;
+            }
+        }
+
+
+
+
+        //Tar tillbaka Pikmin
         if (Raylib.IsMouseButtonDown(MouseButton.MOUSE_RIGHT_BUTTON))
         {
-            pikminHeld = false;
-            pikminThrown = false;
+            whistlePosX = Raylib.GetMouseX();
+            whistlePosY = Raylib.GetMouseY();
+            whistlePos = new Vector2(whistlePosX, whistlePosY);
+            pikminTruePos = new Vector2(pikminPosX, pikminPosY);
+
+
+            pikminWhistleDiff = pikminTruePos - whistlePos;
+            pikminWhistleLength = (int)pikminWhistleDiff.Length();
+
+            Raylib.DrawCircleLines(whistlePosX, whistlePosY, whistleRange, Color.BLUE);
+
+            if (pikminWhistleLength < whistleRangeTrue)
+            {
+                pikminHeld = false;
+                pikminThrown = false;
+                pikminDestReached = false;
+            }
         }
 
         Raylib.EndDrawing();
@@ -148,6 +208,9 @@ while (!Raylib.WindowShouldClose())
 
 
 
+
+
+//Louies movement
 void LouieMovement()
 {
     if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT) || Raylib.IsKeyDown(KeyboardKey.KEY_A))
@@ -171,34 +234,3 @@ void LouieMovement()
         positionLouie.Y += 1;
     }
 }
-
-// public class Pikmin
-// {
-
-//     public int posX;
-//     public int posY;
-//     public int degreeTrow;
-
-//     public Pikmin(int posX, int posY)
-//     {
-//         this.posX = posX;
-//         this.posY = posY;
-//     }
-
-
-//     public void Move()
-//     {
-//         pikminRelative = pikminTruePos - centeredLouie;
-//         if ((int)Math.Ceiling(pikminRelative.Length()) > 100)
-//         {
-//             pikminTruePos = new Vector2(pikminPosX, pikminPosY);
-//             pikminRelative = Vector2.Normalize(pikminRelative) * -2;
-//             pikminPosX += (int)Math.Ceiling(pikminRelative.X);
-//             pikminPosY += (int)Math.Ceiling(pikminRelative.Y);
-//         }
-
-
-//     }
-// }
-
-

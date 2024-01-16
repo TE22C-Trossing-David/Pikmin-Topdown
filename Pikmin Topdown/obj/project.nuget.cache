@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "eTRj1k2LfP7gm/a5NopTK9taW8IrT2b1xoiQYLnOrRx4Hqc/f+u28acoWwyT7oBGNBppSD9afh3vITfBpMGG+w==",
+  "dgSpecHash": "81TVMRPnSZaW72S6RJ1jLp1SHJRS0xT7d7CnEwygLxZVVLUDhNth3GK08EVjHvp7Z6tZBMJXBUsukWpC7NGsLw==",
   "success": true,
-  "projectFilePath": "C:\\Programering\\Pikmin Topdown\\Pikmin Topdown\\Pikmin Topdown.csproj",
+  "projectFilePath": "c:\\Programering\\Pikmin Topdown\\Pikmin Topdown\\Pikmin Topdown.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\david.trossing\\.nuget\\packages\\raylib-cs\\5.0.0\\raylib-cs.5.0.0.nupkg.sha512",
     "C:\\Users\\david.trossing\\.nuget\\packages\\system.numerics.vectors\\4.5.0\\system.numerics.vectors.4.5.0.nupkg.sha512"

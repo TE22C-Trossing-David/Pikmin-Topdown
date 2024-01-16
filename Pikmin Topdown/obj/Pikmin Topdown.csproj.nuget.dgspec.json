@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Programering\\Pikmin Topdown\\Pikmin Topdown\\Pikmin Topdown.csproj": {}
+    "c:\\Programering\\Pikmin Topdown\\Pikmin Topdown\\Pikmin Topdown.csproj": {}
   },
   "projects": {
-    "C:\\Programering\\Pikmin Topdown\\Pikmin Topdown\\Pikmin Topdown.csproj": {
+    "c:\\Programering\\Pikmin Topdown\\Pikmin Topdown\\Pikmin Topdown.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Programering\\Pikmin Topdown\\Pikmin Topdown\\Pikmin Topdown.csproj",
+        "projectUniqueName": "c:\\Programering\\Pikmin Topdown\\Pikmin Topdown\\Pikmin Topdown.csproj",
         "projectName": "Pikmin Topdown",
-        "projectPath": "C:\\Programering\\Pikmin Topdown\\Pikmin Topdown\\Pikmin Topdown.csproj",
+        "projectPath": "c:\\Programering\\Pikmin Topdown\\Pikmin Topdown\\Pikmin Topdown.csproj",
         "packagesPath": "C:\\Users\\david.trossing\\.nuget\\packages\\",
-        "outputPath": "C:\\Programering\\Pikmin Topdown\\Pikmin Topdown\\obj\\",
+        "outputPath": "c:\\Programering\\Pikmin Topdown\\Pikmin Topdown\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
