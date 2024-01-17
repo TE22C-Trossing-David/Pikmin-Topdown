@@ -11,9 +11,7 @@ int screenSizeX = 1920;
 int screenSizeY = 1080;
 Raylib.InitWindow(1000, 1000, "PEAKMAN");
 
-int pikminPosX = 500;
-int pikminPosY = 500;
-Vector2 pikminTruePos = new Vector2();
+Vector2 pikminTruePos = new Vector2(500,500);
 Vector2 pikminRelative = new Vector2();
 
 bool pikminHeld = false;
@@ -24,15 +22,14 @@ Vector2 pikminThrowDiff = new Vector2();
 
 int whistlePosX;
 int whistlePosY;
+int whistleRange = 150;
+int whistleRangeTrue = 170;
 Vector2 whistlePos = new Vector2();
 Vector2 pikminWhistleDiff = new Vector2();
 int pikminWhistleLength = (int)pikminWhistleDiff.Length();
 
 Vector2 throwPosition = new Vector2();
 Vector2 indicatorPoint = new Vector2();
-
-int whistleRange = 150;
-int whistleRangeTrue = 170;
 
 
 int mousePositionX = Raylib.GetMouseX();
@@ -75,11 +72,10 @@ while (!Raylib.WindowShouldClose())
     {
         centeredLouie = new Vector2(centerLouieHeight + positionLouie.X, centerLouieHeight + positionLouie.Y);
         LouieMovement();
-
         Raylib.ClearBackground(Color.WHITE);
         Raylib.BeginDrawing();
         Raylib.DrawTextureRec(Louie, rectLouie, positionLouie, Color.WHITE);
-        Raylib.DrawCircle(pikminPosX, pikminPosY, 20, Color.BLACK);
+        Raylib.DrawCircleV(pikminTruePos, 20, Color.BLACK);
 
 
 
@@ -92,10 +88,9 @@ while (!Raylib.WindowShouldClose())
 
             if ((int)Math.Ceiling(pikminRelative.Length()) > 100)
             {
-                pikminTruePos = new Vector2(pikminPosX, pikminPosY);
                 pikminRelative = Vector2.Normalize(pikminRelative) * 2;
-                pikminPosX += (int)Math.Ceiling(pikminRelative.X);
-                pikminPosY += (int)Math.Ceiling(pikminRelative.Y);
+                pikminTruePos.X += (int)Math.Ceiling(pikminRelative.X);
+                pikminTruePos.Y += (int)Math.Ceiling(pikminRelative.Y);
             }
         }
 
@@ -124,9 +119,6 @@ while (!Raylib.WindowShouldClose())
             {
                 Raylib.DrawLine((int)centeredLouie.X, (int)centeredLouie.Y, (int)centeredLouie.X + (int)indicatorPoint.X, (int)centeredLouie.Y + (int)indicatorPoint.Y, Color.BLACK);
             }
-
-            // var pikmin1 = new Pikmin() {startPosX = mousePositionX, startPosY = mousePositionY};
-
         }
 
 
@@ -135,8 +127,8 @@ while (!Raylib.WindowShouldClose())
         if (Raylib.IsMouseButtonDown(MouseButton.MOUSE_LEFT_BUTTON) && !pikminThrown)
         {
             pikminHeld = true;
-            pikminPosX = (int)centeredLouie.X;
-            pikminPosY = (int)centeredLouie.Y;
+            pikminTruePos.X = (int)centeredLouie.X;
+            pikminTruePos.Y = (int)centeredLouie.Y;
         }
 
 
@@ -148,7 +140,6 @@ while (!Raylib.WindowShouldClose())
             throwPosition = new Vector2(mousePositionX, mousePositionY);
             if (throwVector > maxLength)
             {
-
                 throwPosition.X = (int)centeredLouie.X + (int)indicatorPoint.X;
                 throwPosition.Y = (int)centeredLouie.Y + (int)indicatorPoint.Y;
             }
@@ -156,23 +147,19 @@ while (!Raylib.WindowShouldClose())
 
 
 
-
-
         //Throwing Calculations
         if (pikminThrown && !pikminDestReached)
         {
-            pikminTruePos = new Vector2(pikminPosX, pikminPosY);
-
             pikminThrowDist = throwPosition - pikminTruePos;
             pikminThrowDiff = Vector2.Normalize(pikminThrowDist) * 3;
 
-            pikminPosX += (int)Math.Round(pikminThrowDiff.X);
-            pikminPosY += (int)Math.Round(pikminThrowDiff.Y);
+            pikminTruePos.X += (int)Math.Round(pikminThrowDiff.X);
+            pikminTruePos.Y += (int)Math.Round(pikminThrowDiff.Y);
 
-            if ((int)Math.Ceiling(pikminThrowDist.Length()) < 2)
+            if ((int)Math.Ceiling(pikminThrowDist.Length()) < 3)
             {
-                pikminPosX = (int)throwPosition.X;
-                pikminPosY = (int)throwPosition.Y;
+                pikminTruePos.X = (int)throwPosition.X;
+                pikminTruePos.Y = (int)throwPosition.Y;
                 pikminDestReached = true;
             }
         }
@@ -186,8 +173,6 @@ while (!Raylib.WindowShouldClose())
             whistlePosX = Raylib.GetMouseX();
             whistlePosY = Raylib.GetMouseY();
             whistlePos = new Vector2(whistlePosX, whistlePosY);
-            pikminTruePos = new Vector2(pikminPosX, pikminPosY);
-
 
             pikminWhistleDiff = pikminTruePos - whistlePos;
             pikminWhistleLength = (int)pikminWhistleDiff.Length();
